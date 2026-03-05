@@ -1702,6 +1702,11 @@ tbody tr:nth-child(even) {
     display: none;
   }
 
+  .section--offer .offer-table {
+    min-width: 920px !important;
+    table-layout: fixed;
+  }
+
   .timeline::before {
     display: none;
   }
@@ -1905,6 +1910,75 @@ tbody tr:nth-child(even) {
 
   .offer-mix__list strong {
     font-size: 18px;
+  }
+
+  .section--offer .table-wrap {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  .section--offer .offer-table,
+  .section--offer .offer-table colgroup,
+  .section--offer .offer-table thead {
+    display: none;
+  }
+
+  .section--offer .offer-table,
+  .section--offer .offer-table tbody,
+  .section--offer .offer-table tr,
+  .section--offer .offer-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .section--offer .offer-table tbody {
+    display: grid;
+    gap: 10px;
+  }
+
+  .section--offer .offer-table tr {
+    border: 1px solid #d4ebe5;
+    border-radius: 14px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  .section--offer .offer-table td {
+    display: grid;
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e8f2ef;
+    font-size: 14px;
+    line-height: 1.55;
+    word-break: keep-all;
+  }
+
+  .section--offer .offer-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .section--offer .offer-table td::before {
+    content: attr(data-label);
+    color: #3f6e64;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+
+  .section--offer .offer-table td:nth-child(2) {
+    text-align: left;
+    white-space: normal;
+    padding-right: 12px;
+  }
+
+  .section--offer .offer-table td .cell-money {
+    display: block;
+    white-space: normal;
+    font-size: 19px;
+    line-height: 1.3;
   }
 }
 
