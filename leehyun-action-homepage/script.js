@@ -2,28 +2,48 @@ document.body.classList.add("has-js");
 
 const progressBar = document.getElementById("progressBar");
 const sections = [...document.querySelectorAll("main section[id]")];
-const menuLinks = [...document.querySelectorAll(".top-nav__menu a")];
-const revealBlocks = [...document.querySelectorAll(".reveal")];
-const sideRail = document.getElementById("sideRail");
+const navLinks = [...document.querySelectorAll(".top-nav__menu a")];
+const sideContainer =
+  document.getElementById("sideNav") || document.getElementById("sideRail");
 const navToggle = document.getElementById("navToggle");
 const topMenu = document.getElementById("topMenu");
-const prefersReduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const revealBlocks = [...document.querySelectorAll(".reveal")];
+const prefersReduceMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
 
-const menuMap = new Map(menuLinks.map((link) => [link.hash.replace("#", ""), link]));
-const sideMap = new Map();
+const navMap = new Map(navLinks.map((link) => [link.hash.replace("#", ""), link]));
+const sideDots = [];
 
-if (sideRail) {
+function getSectionLabel(section) {
+  return (
+    section.dataset.nav ||
+    section.dataset.title ||
+    section.dataset.mark ||
+    section.id
+  );
+}
+
+if (sideContainer) {
+  const dotClass = sideContainer.classList.contains("side-rail")
+    ? "side-rail__dot"
+    : "side-nav__dot";
+
   sections.forEach((section) => {
     const dot = document.createElement("button");
+    const label = getSectionLabel(section);
     dot.type = "button";
-    dot.className = "side-rail__dot";
-    dot.setAttribute("aria-label", `${section.dataset.nav || section.id} 섹션 이동`);
-    dot.setAttribute("data-label", section.dataset.nav || section.dataset.mark || section.id);
+    dot.className = dotClass;
+    dot.dataset.label = label;
+    dot.setAttribute("aria-label", `${label} 섹션 이동`);
     dot.addEventListener("click", () => {
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      section.scrollIntoView({
+        behavior: prefersReduceMotion ? "auto" : "smooth",
+        block: "start",
+      });
     });
-    sideMap.set(section.id, dot);
-    sideRail.appendChild(dot);
+    sideContainer.appendChild(dot);
+    sideDots.push(dot);
   });
 }
 
@@ -47,7 +67,7 @@ function toggleMobileMenu() {
 if (navToggle && topMenu) {
   navToggle.addEventListener("click", toggleMobileMenu);
 
-  menuLinks.forEach((link) => {
+  navLinks.forEach((link) => {
     link.addEventListener("click", () => {
       if (window.innerWidth <= 760) closeMobileMenu();
     });
@@ -71,43 +91,51 @@ if (navToggle && topMenu) {
   });
 }
 
-function setActiveNavigation(id) {
-  menuLinks.forEach((link) => link.classList.remove("is-active"));
-  const activeMenu = menuMap.get(id);
-  if (activeMenu) activeMenu.classList.add("is-active");
+function syncActiveState(sectionId) {
+  navLinks.forEach((link) => link.classList.remove("is-active"));
+  const activeNav = navMap.get(sectionId);
+  if (activeNav) activeNav.classList.add("is-active");
 
-  sideMap.forEach((dot) => dot.classList.remove("is-active"));
-  const activeDot = sideMap.get(id);
-  if (activeDot) activeDot.classList.add("is-active");
+  if (!sideDots.length) return;
+  sideDots.forEach((dot) => dot.classList.remove("is-active"));
+  const idx = sections.findIndex((section) => section.id === sectionId);
+  if (idx >= 0 && sideDots[idx]) {
+    sideDots[idx].classList.add("is-active");
+  }
 }
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
+if (revealBlocks.length) {
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+        }
       }
-    }
-  },
-  { threshold: 0.16 }
-);
+    },
+    { threshold: 0.16 }
+  );
 
-revealBlocks.forEach((item) => revealObserver.observe(item));
+  revealBlocks.forEach((item) => revealObserver.observe(item));
+}
 
-const sectionObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      setActiveNavigation(entry.target.id);
-    });
-  },
-  { threshold: 0.35, rootMargin: "-15% 0px -45% 0px" }
-);
+if (sections.length) {
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        syncActiveState(entry.target.id);
+      });
+    },
+    { threshold: 0.35, rootMargin: "-15% 0px -45% 0px" }
+  );
 
-sections.forEach((section) => sectionObserver.observe(section));
-if (sections[0]) setActiveNavigation(sections[0].id);
+  sections.forEach((section) => sectionObserver.observe(section));
+  syncActiveState(sections[0].id);
+}
 
 function updateProgress() {
+  if (!progressBar) return;
   const doc = document.documentElement;
   const maxScrollable = doc.scrollHeight - doc.clientHeight;
   const ratio = maxScrollable > 0 ? (doc.scrollTop / maxScrollable) * 100 : 0;
@@ -121,6 +149,7 @@ updateProgress();
 if (!prefersReduceMotion) {
   const hero = document.getElementById("hero");
   const headline = document.querySelector(".hero__headline");
+
   if (hero && headline) {
     hero.addEventListener("pointermove", (event) => {
       const rect = hero.getBoundingClientRect();
@@ -128,6 +157,7 @@ if (!prefersReduceMotion) {
       const y = (event.clientY - rect.top) / rect.height - 0.5;
       headline.style.transform = `translateY(${y * -8}px) rotateX(${y * 3}deg) rotateY(${x * -5}deg)`;
     });
+
     hero.addEventListener("pointerleave", () => {
       headline.style.transform = "";
     });

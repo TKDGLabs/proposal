@@ -797,6 +797,27 @@ li {
   padding-bottom: 44px;
 }
 
+.section--closing .section-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding-left: 74px;
+  padding-right: 74px;
+}
+
+.section--closing .section-head .section-head__num {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.section--closing .section-head h2 {
+  margin: 0 auto;
+  text-align: center;
+}
+
 .closing-copy {
   max-width: 56ch;
   margin: 0 auto 12px;
@@ -1805,7 +1826,11 @@ tbody tr:nth-child(even) {
   }
 
   .hero__headline {
-    font-size: clamp(45px, 12vw, 74px);
+    max-width: 100%;
+    font-size: clamp(40px, 11vw, 68px);
+    word-break: keep-all;
+    line-break: loose;
+    text-wrap: pretty;
   }
 
   .hero__sub {
@@ -1820,6 +1845,23 @@ tbody tr:nth-child(even) {
   .pill {
     font-size: 12px;
     padding: 6px 10px;
+  }
+
+  .section--closing .section-head {
+    padding-left: 62px;
+    padding-right: 62px;
+  }
+
+  h2 {
+    word-break: keep-all;
+    line-break: loose;
+    text-wrap: pretty;
+  }
+
+  h3 {
+    word-break: keep-all;
+    line-break: loose;
+    text-wrap: pretty;
   }
 
   .offer-flow__canvas {
